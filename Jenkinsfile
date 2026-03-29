@@ -5,15 +5,11 @@ pipeline {
     IMAGE_NAME = 'amritksingh121/html-cicd-app'
   }
   stages {
-    stage('Build Docker Image') {
-      steps {
-        sh 'docker build -t $IMAGE_NAME:$BUILD_NUMBER .'
-      }
-    }
-    stage('Push to DockerHub') {
+    stage('Build and Push Docker Image') {
       steps {
         sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-        sh 'docker push $IMAGE_NAME:$BUILD_NUMBER'
+        sh 'docker buildx create --use --name multibuilder || true'
+        sh 'docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_NAME:$BUILD_NUMBER --push .'
       }
     }
     stage('Update Manifest Repo') {
