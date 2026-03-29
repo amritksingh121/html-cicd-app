@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    docker { image 'docker:latest' }
-  }
+  agent any
   environment {
     DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
     IMAGE_NAME = 'amritksingh121/html-cicd-app'
@@ -21,6 +19,8 @@ pipeline {
     stage('Update Manifest Repo') {
       steps {
         sh """
+          git clone https://github.com/amritksingh121/html-cicd-app-manifests.git
+          cd html-cicd-app-manifests
           sed -i 's|$IMAGE_NAME:.*|$IMAGE_NAME:$BUILD_NUMBER|g' deployment.yaml
           git config user.email 'jenkins@cicd.com'
           git config user.name 'Jenkins'
