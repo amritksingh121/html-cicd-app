@@ -19,6 +19,7 @@ pipeline {
     stage('Update Manifest Repo') {
       steps {
         sh """
+          rm -rf html-cicd-app-manifests
           git clone https://github.com/amritksingh121/html-cicd-app-manifests.git
           cd html-cicd-app-manifests
           sed -i 's|$IMAGE_NAME:.*|$IMAGE_NAME:$BUILD_NUMBER|g' deployment.yaml
