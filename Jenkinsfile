@@ -18,17 +18,19 @@ pipeline {
     }
     stage('Update Manifest Repo') {
       steps {
-        sh """
-          rm -rf html-cicd-app-manifests
-          git clone https://github.com/amritksingh121/html-cicd-app-manifests.git
-          cd html-cicd-app-manifests
-          sed -i 's|$IMAGE_NAME:.*|$IMAGE_NAME:$BUILD_NUMBER|g' deployment.yaml
-          git config user.email 'jenkins@cicd.com'
-          git config user.name 'Jenkins'
-          git add deployment.yaml
-          git commit -m 'Update image to $BUILD_NUMBER'
-          git push
-        """
+        withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+          sh """
+            rm -rf html-cicd-app-manifests
+            git clone https://$GIT_USER:$GIT_TOKEN@github.com/amritksingh121/html-cicd-app-manifests.git
+            cd html-cicd-app-manifests
+            sed -i 's|$IMAGE_NAME:.*|$IMAGE_NAME:$BUILD_NUMBER|g' deployment.yaml
+            git config user.email 'jenkins@cicd.com'
+            git config user.name 'Jenkins'
+            git add deployment.yaml
+            git commit -m 'Update image to $BUILD_NUMBER'
+            git push
+          """
+        }
       }
     }
   }
